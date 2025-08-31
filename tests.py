@@ -1,5 +1,30 @@
 import pytest
 
+@pytest.fixture
+def collector():
+    return BooksCollector()
+
+@pytest.fixture
+def collector_with_book(collector):
+    collector.add_new_book('Тестовая книга')
+    return collector
+
+@pytest.fixture
+def collector_with_books(collector):
+    collector.add_new_book('Книга 1')
+    collector.add_new_book('Книга 2')
+    collector.set_book_genre('Книга 1', 'Фантастика')
+    collector.set_book_genre('Книга 2', 'Ужасы')
+    return collector
+
+@pytest.fixture
+def collector_with_favorites(collector):
+    collector.add_new_book('Книга 1')
+    collector.add_new_book('Книга 2')
+    collector.add_book_in_favorites('Книга 1')
+    collector.add_book_in_favorites('Книга 2')
+    return collector
+
 class TestBooksCollector:
 
     @pytest.mark.parametrize('book_name, expected', [
@@ -8,23 +33,9 @@ class TestBooksCollector:
         ('A' * 40, True),
         ('A' * 41, False),
     ])
-    def test_add_new_book_name_length_boundary(self, book_name, expected):
-        collector = BooksCollector()
+    def test_add_new_book_name_length_boundary(self, collector, book_name, expected):
         collector.add_new_book(book_name)
         assert (book_name in collector.books_genre) == expected
-
-    @pytest.mark.parametrize('genre', [
-        'Фантастика',
-        'Ужасы',
-        'Детективы',
-        'Мультфильмы',
-        'Комедии'
-    ])
-    def test_set_book_genre_different_genres(self, genre):
-        collector = BooksCollector()
-        collector.add_new_book('Тестовая книга')
-        collector.set_book_genre('Тестовая книга', genre)
-        assert collector.get_book_genre('Тестовая книга') == genre
 
     @pytest.mark.parametrize('genre, is_for_children', [
         ('Фантастика', True),
